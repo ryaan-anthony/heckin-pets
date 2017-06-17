@@ -20,8 +20,14 @@ function random_position
   echo $(( ( RANDOM % $max )  + 1 ))
 }
 
+function refresh_screen
+{
+  tput clear
+}
+
 function initialize
 {
+  refresh_screen
   max_x=$((grid_width -1))
   max_y=$((grid_height -1))
   position_x=$(random_position $max_x)
@@ -41,7 +47,7 @@ function next_sequence
 function prepare_next_input
 {
   read -sn 4 -t $refresh_rate -p "$prompt" last_input
-  clear
+  refresh_screen
 }
 
 # Consume user input
@@ -73,6 +79,7 @@ function display_current_sequence
   draw_grid
 }
 
+# Display the stats
 function display_stats
 {
   # TODO: display stats
@@ -82,34 +89,59 @@ function display_stats
   echo 'Hunger: ||||||........'
 }
 
+# Move the emoji around the grid
 function animate_emoji
 {
   # TODO: animate emoji
   local animation=
 }
 
+function is_emoji_position
+{
+  if [[ $position_x == $1 && $position_y == $2 ]]; then
+    return 0 # true
+  fi
+  return 1 # false
+}
+
+function is_treat_position
+{
+  if [[ $treat_x == $1 && $treat_y == $2 ]]; then
+    return 0 # true
+  fi
+  return 1 # false
+}
+
+function is_wall_position
+{
+  if [[ $1 == 0 || $1 == $max_x || $2 == 0 || $2 == $max_y ]]; then
+    return 0 # true
+  fi
+  return 1 # false
+}
+
+# Draw the grid
 function draw_grid
 {
   for (( y=0; y < $grid_height; y++ )); do
-    local column=
+    local line=
     for (( x=0; x < $grid_width; x++ )); do
+      # Default character is a floor
       local character=$floor_character
-      if [[ $position_x == $x && $position_y == $y ]]; then
-        character=$emoji
-      fi
-      if [[ $treat_x == $x && $treat_y == $y ]]; then
-        character=$treat
-      fi
-      if [[ $x == 0 || $x == $max_x || $y == 0 || $y == $max_y ]]; then
-        character=$wall_character
-      fi
-      column+=$character
+      # Draw the emoji
+      if is_emoji_position $x $y; then character=$emoji; fi
+      # Draw the treat
+      if is_treat_position $x $y; then character=$treat; fi
+      # Draw the wall
+      if is_wall_position $x $y; then character=$wall_character; fi
+      # Build the line
+      line+=$character
     done
-    echo $column
+    echo $line
   done
 }
+
 # Program start
-clear;
 initialize;
 while true; do
   next_sequence
