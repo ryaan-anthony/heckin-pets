@@ -2,7 +2,8 @@
 
 function next
 {
-  if [[ ${#last} == 1 ]]; then
+  emoji_hexdump=$(echo $last | hexdump | xargs)
+  if [[ ${#emoji_hexdump} > 22 && ${#last} == 1 ]]; then
     saved=$last
     last=
   fi
@@ -14,7 +15,7 @@ function next
   echo ${0: -1}
   echo name: $NAME
 
-  read -n 4 -t 5 last
+  read -sn 4 -t 1 last
   clear
 }
 

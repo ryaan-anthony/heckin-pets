@@ -16,7 +16,7 @@ function initialize_stats
   date +%s > "$stats/time"
 }
 
-emoji_hexdump=(`echo $1 | hexdump | xargs`)
+emoji_hexdump=$(echo $1 | hexdump | xargs)
 if [[ ${#1} == 1 && ${#emoji_hexdump} > 22 && $1 && $2 ]]; then
   create_pet $*
   initialize_stats $*
