@@ -6,6 +6,7 @@ refresh_rate=10 #seconds
 wall_character='#'
 floor_character='.'
 prompt='Type an Emoji: '
+stats_directory=".${NAME}_stats"
 
 # Get the length of the hexdump signature
 function hexdump_length
@@ -75,7 +76,8 @@ function display_current_sequence
 function display_stats
 {
   # TODO: display stats
-  echo "Name: ${NAME}"
+  AGE=$(cat "${stats_directory}/age")
+  echo "Name: ${NAME} (${AGE} years)"
   echo 'Health: |||||||||||...'
   echo 'Hunger: ||||||........'
 }
