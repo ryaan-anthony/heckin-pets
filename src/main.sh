@@ -1,10 +1,11 @@
 #!/bin/bash
 
-grid_width=20 #character length
+grid_width=25 #character length
 grid_height=10 #line height
 refresh_rate=10 #seconds
 wall_character='#'
 floor_character='.'
+prompt='Type an Emoji: '
 
 # Get the length of the hexdump signature
 function hexdump_length
@@ -38,7 +39,7 @@ function next_sequence
 # Listen for user input
 function prepare_next_input
 {
-  read -sn 4 -t $refresh_rate last_input
+  read -sn 4 -t $refresh_rate -p "$prompt" last_input
   clear
 }
 
@@ -67,14 +68,16 @@ function place_treat
 function display_current_sequence
 {
   animate_emoji
-  draw_grid
   display_stats
+  draw_grid
 }
 
 function display_stats
 {
   # TODO: display stats
-  echo name: $NAME
+  echo "Name: ${NAME}"
+  echo 'Health: |||||||||||...'
+  echo 'Hunger: ||||||........'
 }
 
 function animate_emoji
