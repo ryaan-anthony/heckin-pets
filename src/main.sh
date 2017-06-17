@@ -14,7 +14,7 @@ function hexdump_length
 
 function random_position
 {
-  max=$(($1 - 2))
+  local max=$(($1 - 2))
   echo $(( ( RANDOM % $max )  + 1 ))
 }
 
@@ -46,7 +46,7 @@ function prepare_next_input
 function handle_last_input
 {
   # Check user input for emoji
-  hexdump_length=$(hexdump_length $last_input)
+  local hexdump_length=$(hexdump_length $last_input)
   if [[ $((hexdump_length)) > 22 && ${#last_input} == 1 ]]; then
     treat=$last_input
     place_treat
@@ -80,15 +80,15 @@ function display_stats
 function animate_emoji
 {
   # TODO: animate emoji
-  animation=
+  local animation=
 }
 
 function draw_grid
 {
   for (( y=0; y < $grid_height; y++ )); do
-    column=
+    local column=
     for (( x=0; x < $grid_width; x++ )); do
-      character=$floor_character
+      local character=$floor_character
       if [[ $position_x == $x && $position_y == $y ]]; then
         character=$emoji
       fi
