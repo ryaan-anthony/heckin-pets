@@ -1,9 +1,14 @@
 #!/bin/bash
 
+function hexdump_length
+{
+  echo $1 | hexdump | xargs | wc -c
+}
+
 function next
 {
-  emoji_hexdump=$(echo $last | hexdump | xargs)
-  if [[ ${#emoji_hexdump} > 22 && ${#last} == 1 ]]; then
+  hexdump_length=$(hexdump_length $last)
+  if [[ $((hexdump_length)) > 22 && ${#last} == 1 ]]; then
     saved=$last
     last=
   fi

@@ -16,8 +16,14 @@ function initialize_stats
   date +%s > "$stats/time"
 }
 
-emoji_hexdump=$(echo $1 | hexdump | xargs)
-if [[ ${#1} == 1 && ${#emoji_hexdump} > 22 && $1 && $2 ]]; then
+function hexdump_length
+{
+  echo $1 | hexdump | xargs | wc -c
+}
+
+hexdump_length=$(hexdump_length $1)
+
+if [[ ${#1} == 1 && $((hexdump_length)) > 22 && $1 && $2 ]]; then
   create_pet $*
   initialize_stats $*
   echo Type \"./$1\" to wake your pet!
