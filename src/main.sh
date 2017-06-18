@@ -114,10 +114,7 @@ function animate_emoji
 
 function is_wall_position
 {
-  if [[ $1 == 0 || $1 == $max_x || $2 == 0 || $2 == $max_y ]]; then
-    return 0 # true
-  fi
-  return 1 # false
+  return $([[ $1 == 0 || $1 == $max_x || $2 == 0 || $2 == $max_y ]])
 }
 
 # Draw the grid
