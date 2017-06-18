@@ -1,5 +1,6 @@
 #!/bin/bash
 
+IFS='%' #set field separator to something other than space to preserve whitespace
 grid_width=20 #character length
 grid_height=8 #line height
 refresh_rate=1 #seconds
@@ -21,13 +22,12 @@ function random_position
 
 function initialize
 {
-  clear
-  IFS='%'
   max_x=$((grid_width -1))
   max_y=$((grid_height -1))
   position_x=$(random_position $max_x)
   position_y=$(random_position $max_y)
   emoji=${0: -1}
+  clear
   draw_grid
   display_stats
 }
@@ -65,6 +65,7 @@ function place_treat
   if [[ $treat_x == $position_x || $treat_y == $position_y ]]; then
     place_treat
   fi
+  tput cup $treat_y $treat_x; echo $treat
 }
 
 # Display the emoji, grid, and stats
