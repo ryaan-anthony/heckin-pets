@@ -24,11 +24,14 @@ function initialize
 {
   max_x=$((grid_width -1))
   max_y=$((grid_height -1))
+  target_x=$(random_position $max_x)
+  target_y=$(random_position $max_y)
   position_x=$(random_position $max_x)
   position_y=$(random_position $max_y)
   emoji=${0: -1}
   clear
   tput setaf 9
+  tput civis --invisible
   draw_grid
   display_stats
   tput sgr0
@@ -77,7 +80,6 @@ function display_current_sequence
   animate_emoji
   update_stats
   make_sounds
-  tput rc
 }
 
 function make_sounds
@@ -101,17 +103,53 @@ function display_stats
 }
 function update_stats
 {
-  stats=
+  :
 }
 
 # Move the emoji around the grid
 function animate_emoji
 {
-  # TODO: animate emoji
-  tput cup $position_y $position_x; echo $floor_character
-  position_x=$(random_position $max_x)
-  position_y=$(random_position $max_y)
-  tput cup $position_y $position_x; echo $emoji
+  local old_x=$position_x
+  local old_y=$position_y
+  move_to_target && : || update_emoji $old_y $old_x $position_y $position_x
+}
+
+function update_emoji
+{
+  tput cup $1 $2; echo $floor_character
+  tput cup $3 $4; echo $emoji
+}
+
+function move_to_target
+{
+  find_target
+  if [[ $position_y -lt $target_y && $(((RANDOM % 3))) == 1 ]]; then
+    position_y=$((position_y + 1))
+  elif [[ $position_x -lt $target_x && $(((RANDOM % 3))) == 1 ]]; then
+    position_x=$((position_x + 1))
+  elif [[ $position_y -gt $target_y && $(((RANDOM % 3))) == 1 ]]; then
+    position_y=$((position_y - 1))
+  elif [[ $position_x -gt $target_x && $(((RANDOM % 3))) == 1 ]]; then
+    position_x=$((position_x - 1))
+  elif [[ $position_y == $target_y && $position_x == $target_x ]]; then
+    # At target, return true
+    return 0
+  else
+    # Undecided move, try again
+    return $(move_to_target)
+  fi
+  return 1
+}
+
+function find_target
+{
+  ((RANDOM % 5)) && : || set_target
+}
+
+function set_target
+{
+  target_x=$(random_position $max_x)
+  target_y=$(random_position $max_y)
 }
 
 function is_even
@@ -134,7 +172,6 @@ function draw_grid
     done
     echo $line
   done
-  tput sc
 }
 
 # Program start
