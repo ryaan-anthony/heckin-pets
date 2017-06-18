@@ -1,11 +1,10 @@
 #!/bin/bash
 
-grid_width=25 #character length
-grid_height=10 #line height
-refresh_rate=10 #seconds
-wall_character='#'
-floor_character='.'
-prompt='Type an Emoji: '
+grid_width=20 #character length
+grid_height=8 #line height
+refresh_rate=1 #seconds
+wall_character='.'
+floor_character=' '
 stats_directory=".${NAME}_stats"
 
 # Get the length of the hexdump signature
@@ -20,19 +19,17 @@ function random_position
   echo $(( ( RANDOM % $max )  + 1 ))
 }
 
-function refresh_screen
-{
-  tput clear
-}
-
 function initialize
 {
-  refresh_screen
+  clear
+  IFS='%'
   max_x=$((grid_width -1))
   max_y=$((grid_height -1))
   position_x=$(random_position $max_x)
   position_y=$(random_position $max_y)
   emoji=${0: -1}
+  draw_grid
+  display_stats
 }
 
 # Describe the request flow
@@ -46,8 +43,7 @@ function next_sequence
 # Listen for user input
 function prepare_next_input
 {
-  read -sn 4 -t $refresh_rate -p "$prompt" last_input
-  refresh_screen
+  read -sn 4 -t $refresh_rate last_input
 }
 
 # Consume user input
@@ -75,8 +71,19 @@ function place_treat
 function display_current_sequence
 {
   animate_emoji
-  display_stats
-  draw_grid
+  update_stats
+  make_sounds
+  tput cup $((max_y + 3)) 0
+}
+
+function make_sounds
+{
+  if [[ $make_sounds ]]; then
+    tput bel
+    sleep '0.3'
+    tput bel
+    make_sounds=
+  fi
 }
 
 # Display the stats
@@ -85,31 +92,23 @@ function display_stats
   # TODO: display stats
   AGE=$(cat "${stats_directory}/age")
   echo "Name: ${NAME} (${AGE} years)"
-  echo 'Health: |||||||||||...'
-  echo 'Hunger: ||||||........'
+  # tput setaf 3
+  echo 'Health: [ -----    ]'
+  # tput sgr0
+}
+function update_stats
+{
+  stats=
 }
 
 # Move the emoji around the grid
 function animate_emoji
 {
   # TODO: animate emoji
-  local animation=
-}
-
-function is_emoji_position
-{
-  if [[ $position_x == $1 && $position_y == $2 ]]; then
-    return 0 # true
-  fi
-  return 1 # false
-}
-
-function is_treat_position
-{
-  if [[ $treat_x == $1 && $treat_y == $2 ]]; then
-    return 0 # true
-  fi
-  return 1 # false
+  tput cup $position_y $position_x; echo $floor_character
+  position_x=$(random_position $max_x)
+  position_y=$(random_position $max_y)
+  tput cup $position_y $position_x; echo $emoji
 }
 
 function is_wall_position
@@ -126,15 +125,10 @@ function draw_grid
   for (( y=0; y < $grid_height; y++ )); do
     local line=
     for (( x=0; x < $grid_width; x++ )); do
-      # Default character is a floor
       local character=$floor_character
-      # Draw the emoji
-      if is_emoji_position $x $y; then character=$emoji; fi
-      # Draw the treat
-      if is_treat_position $x $y; then character=$treat; fi
-      # Draw the wall
-      if is_wall_position $x $y; then character=$wall_character; fi
-      # Build the line
+      if is_wall_position $x $y; then
+        character=$wall_character;
+      fi
       line+=$character
     done
     echo $line
@@ -142,7 +136,7 @@ function draw_grid
 }
 
 # Program start
-initialize;
+initialize
 while true; do
   next_sequence
 done
