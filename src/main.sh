@@ -126,11 +126,7 @@ function draw_grid
   for (( y=0; y < $grid_height; y++ )); do
     local line=
     for (( x=0; x < $grid_width; x++ )); do
-      local character=$floor_character
-      if is_wall_position $x $y; then
-        character=$wall_character;
-      fi
-      line+=$character
+      line+=$(is_wall_position $x $y && echo $wall_character || echo $floor_character)
     done
     echo $line
   done
