@@ -2,9 +2,9 @@
 
 function create_pet
 {
-  head -n 1 src/main.sh > $1
+  head -n 1 bin/meta-pets > $1
   echo "NAME=\"$2\"" >> $1
-  tail -n +2 src/main.sh >> $1
+  tail -n +2 bin/meta-pets >> $1
 }
 
 function initialize_stats
